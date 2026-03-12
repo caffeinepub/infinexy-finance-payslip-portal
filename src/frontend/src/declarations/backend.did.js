@@ -20,6 +20,7 @@ export const UserProfile = IDL.Record({
 export const Time = IDL.Int;
 export const Payslip = IDL.Record({
   'id' : IDL.Nat,
+  'remark' : IDL.Text,
   'month' : IDL.Text,
   'professionTax' : IDL.Nat,
   'employeeUsername' : IDL.Text,
@@ -80,6 +81,7 @@ export const idlService = IDL.Service({
         IDL.Text,
         IDL.Text,
         IDL.Text,
+        IDL.Text,
         IDL.Int,
         IDL.Int,
         IDL.Int,
@@ -129,6 +131,7 @@ export const idlService = IDL.Service({
         IDL.Text,
         IDL.Text,
         IDL.Text,
+        IDL.Text,
         IDL.Int,
         IDL.Int,
         IDL.Int,
@@ -150,6 +153,7 @@ export const idlFactory = ({ IDL }) => {
   const Time = IDL.Int;
   const Payslip = IDL.Record({
     'id' : IDL.Nat,
+    'remark' : IDL.Text,
     'month' : IDL.Text,
     'professionTax' : IDL.Nat,
     'employeeUsername' : IDL.Text,
@@ -210,6 +214,7 @@ export const idlFactory = ({ IDL }) => {
           IDL.Text,
           IDL.Text,
           IDL.Text,
+          IDL.Text,
           IDL.Int,
           IDL.Int,
           IDL.Int,
@@ -259,6 +264,7 @@ export const idlFactory = ({ IDL }) => {
           IDL.Nat,
           IDL.Nat,
           IDL.Nat,
+          IDL.Text,
           IDL.Text,
           IDL.Text,
           IDL.Text,

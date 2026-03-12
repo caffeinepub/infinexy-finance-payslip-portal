@@ -17,6 +17,7 @@ export interface Employee {
 }
 export interface Payslip {
   'id' : bigint,
+  'remark' : string,
   'month' : string,
   'professionTax' : bigint,
   'employeeUsername' : string,
@@ -76,6 +77,7 @@ export interface _SERVICE {
       string,
       string,
       string,
+      string,
       bigint,
       bigint,
       bigint,
@@ -116,6 +118,7 @@ export interface _SERVICE {
       bigint,
       bigint,
       bigint,
+      string,
       string,
       string,
       string,

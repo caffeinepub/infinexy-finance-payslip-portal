@@ -8,9 +8,11 @@ import Array "mo:core/Array";
 import Order "mo:core/Order";
 import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
+import Migration "migration";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
+(with migration = Migration.run)
 actor {
   type Employee = {
     username : Text;
@@ -49,6 +51,7 @@ actor {
     accountNumber : Text;
     ifscCode : Text;
     createdAt : Time.Time;
+    remark : Text;
     payableBasicSalary : Int;
     payableMobileAllowance : Int;
     payableIncentive : Int;
@@ -183,6 +186,7 @@ actor {
     bankName : Text,
     accountNumber : Text,
     ifscCode : Text,
+    remark: Text,
     payableBasicSalary : Int,
     payableMobileAllowance : Int,
     payableIncentive : Int,
@@ -219,6 +223,7 @@ actor {
       accountNumber;
       ifscCode;
       createdAt = Time.now();
+      remark;
       payableBasicSalary;
       payableMobileAllowance;
       payableIncentive;
@@ -251,6 +256,7 @@ actor {
     bankName : Text,
     accountNumber : Text,
     ifscCode : Text,
+    remark: Text,
     payableBasicSalary : Int,
     payableMobileAllowance : Int,
     payableIncentive : Int,
@@ -286,6 +292,7 @@ actor {
       accountNumber;
       ifscCode;
       createdAt = Time.now();
+      remark;
       payableBasicSalary;
       payableMobileAllowance;
       payableIncentive;

@@ -101,6 +101,7 @@ export interface UserProfile {
 }
 export interface Payslip {
     id: bigint;
+    remark: string;
     month: string;
     professionTax: bigint;
     employeeUsername: string;
@@ -136,7 +137,7 @@ export enum UserRole {
 export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    createPayslip(employeeUsername: string, month: string, year: bigint, employeeName: string, panNo: string, employeeId: string, aadharNumber: string, designation: string, location: string, businessUnit: string, dateOfBirth: string, dateOfJoining: string, daysPaid: bigint, basicSalary: bigint, mobileAllowance: bigint, incentive: bigint, insurance: bigint, professionTax: bigint, paymentMode: string, bankName: string, accountNumber: string, ifscCode: string, payableBasicSalary: bigint, payableMobileAllowance: bigint, payableIncentive: bigint): Promise<void>;
+    createPayslip(employeeUsername: string, month: string, year: bigint, employeeName: string, panNo: string, employeeId: string, aadharNumber: string, designation: string, location: string, businessUnit: string, dateOfBirth: string, dateOfJoining: string, daysPaid: bigint, basicSalary: bigint, mobileAllowance: bigint, incentive: bigint, insurance: bigint, professionTax: bigint, paymentMode: string, bankName: string, accountNumber: string, ifscCode: string, remark: string, payableBasicSalary: bigint, payableMobileAllowance: bigint, payableIncentive: bigint): Promise<void>;
     deletePayslip(payslipId: bigint): Promise<void>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
@@ -150,7 +151,7 @@ export interface backendInterface {
     loginEmployee(username: string, password: string): Promise<void>;
     registerEmployee(username: string, employeeName: string, password: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    updatePayslip(payslipId: bigint, employeeUsername: string, month: string, year: bigint, employeeName: string, panNo: string, employeeId: string, aadharNumber: string, designation: string, location: string, businessUnit: string, dateOfBirth: string, dateOfJoining: string, daysPaid: bigint, basicSalary: bigint, mobileAllowance: bigint, incentive: bigint, insurance: bigint, professionTax: bigint, paymentMode: string, bankName: string, accountNumber: string, ifscCode: string, payableBasicSalary: bigint, payableMobileAllowance: bigint, payableIncentive: bigint): Promise<void>;
+    updatePayslip(payslipId: bigint, employeeUsername: string, month: string, year: bigint, employeeName: string, panNo: string, employeeId: string, aadharNumber: string, designation: string, location: string, businessUnit: string, dateOfBirth: string, dateOfJoining: string, daysPaid: bigint, basicSalary: bigint, mobileAllowance: bigint, incentive: bigint, insurance: bigint, professionTax: bigint, paymentMode: string, bankName: string, accountNumber: string, ifscCode: string, remark: string, payableBasicSalary: bigint, payableMobileAllowance: bigint, payableIncentive: bigint): Promise<void>;
 }
 import type { UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
@@ -183,17 +184,17 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async createPayslip(arg0: string, arg1: string, arg2: bigint, arg3: string, arg4: string, arg5: string, arg6: string, arg7: string, arg8: string, arg9: string, arg10: string, arg11: string, arg12: bigint, arg13: bigint, arg14: bigint, arg15: bigint, arg16: bigint, arg17: bigint, arg18: string, arg19: string, arg20: string, arg21: string, arg22: bigint, arg23: bigint, arg24: bigint): Promise<void> {
+    async createPayslip(arg0: string, arg1: string, arg2: bigint, arg3: string, arg4: string, arg5: string, arg6: string, arg7: string, arg8: string, arg9: string, arg10: string, arg11: string, arg12: bigint, arg13: bigint, arg14: bigint, arg15: bigint, arg16: bigint, arg17: bigint, arg18: string, arg19: string, arg20: string, arg21: string, arg22: string, arg23: bigint, arg24: bigint, arg25: bigint): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.createPayslip(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24);
+                const result = await this.actor.createPayslip(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.createPayslip(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24);
+            const result = await this.actor.createPayslip(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25);
             return result;
         }
     }
@@ -379,17 +380,17 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async updatePayslip(arg0: bigint, arg1: string, arg2: string, arg3: bigint, arg4: string, arg5: string, arg6: string, arg7: string, arg8: string, arg9: string, arg10: string, arg11: string, arg12: string, arg13: bigint, arg14: bigint, arg15: bigint, arg16: bigint, arg17: bigint, arg18: bigint, arg19: string, arg20: string, arg21: string, arg22: string, arg23: bigint, arg24: bigint, arg25: bigint): Promise<void> {
+    async updatePayslip(arg0: bigint, arg1: string, arg2: string, arg3: bigint, arg4: string, arg5: string, arg6: string, arg7: string, arg8: string, arg9: string, arg10: string, arg11: string, arg12: string, arg13: bigint, arg14: bigint, arg15: bigint, arg16: bigint, arg17: bigint, arg18: bigint, arg19: string, arg20: string, arg21: string, arg22: string, arg23: string, arg24: bigint, arg25: bigint, arg26: bigint): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.updatePayslip(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25);
+                const result = await this.actor.updatePayslip(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25, arg26);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.updatePayslip(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25);
+            const result = await this.actor.updatePayslip(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24, arg25, arg26);
             return result;
         }
     }

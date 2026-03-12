@@ -1,7 +1,13 @@
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -9,6 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { CalendarIcon } from "lucide-react";
 import { useState } from "react";
 import type { Payslip } from "../backend";
 
@@ -53,6 +61,7 @@ type PayslipFormData = {
   payableBasicSalary: string;
   payableMobileAllowance: string;
   payableIncentive: string;
+  remark: string;
 };
 
 const DEFAULT_FORM: PayslipFormData = {
@@ -81,7 +90,25 @@ const DEFAULT_FORM: PayslipFormData = {
   payableBasicSalary: "",
   payableMobileAllowance: "",
   payableIncentive: "",
+  remark: "",
 };
+
+function formatDateDDMMYYYY(date: Date): string {
+  const dd = String(date.getDate()).padStart(2, "0");
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const yyyy = date.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+}
+
+function parseDDMMYYYY(str: string): Date | undefined {
+  if (!str) return undefined;
+  const parts = str.split("/");
+  if (parts.length !== 3) return undefined;
+  const [dd, mm, yyyy] = parts;
+  const d = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+  if (Number.isNaN(d.getTime())) return undefined;
+  return d;
+}
 
 function payslipToForm(p: Payslip): PayslipFormData {
   return {
@@ -110,6 +137,7 @@ function payslipToForm(p: Payslip): PayslipFormData {
     payableBasicSalary: String(p.payableBasicSalary),
     payableMobileAllowance: String(p.payableMobileAllowance),
     payableIncentive: String(p.payableIncentive),
+    remark: p.remark ?? "",
   };
 }
 
@@ -131,15 +159,21 @@ export function PayslipForm({
   const [form, setForm] = useState<PayslipFormData>(
     initial ? payslipToForm(initial) : DEFAULT_FORM,
   );
+  const [dobOpen, setDobOpen] = useState(false);
+  const [dojOpen, setDojOpen] = useState(false);
 
   const set =
-    (key: keyof PayslipFormData) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    (key: keyof PayslipFormData) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setForm((prev) => ({ ...prev, [key]: e.target.value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await onSubmit(form);
   };
+
+  const dobDate = parseDDMMYYYY(form.dateOfBirth);
+  const dojDate = parseDDMMYYYY(form.dateOfJoining);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -212,19 +246,85 @@ export function PayslipForm({
               placeholder="IT"
             />
           </Field>
+
+          {/* Date of Birth - Calendar Picker */}
           <Field label="Date of Birth">
-            <Input
-              value={form.dateOfBirth}
-              onChange={set("dateOfBirth")}
-              placeholder="DD/MM/YYYY"
-            />
+            <Popover open={dobOpen} onOpenChange={setDobOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  type="button"
+                  className="w-full justify-start text-left font-normal"
+                  data-ocid="create_payslip.dob.button"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4 opacity-60" />
+                  {form.dateOfBirth ? (
+                    form.dateOfBirth
+                  ) : (
+                    <span className="text-muted-foreground">DD/MM/YYYY</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dobDate}
+                  onSelect={(date) => {
+                    if (date) {
+                      setForm((prev) => ({
+                        ...prev,
+                        dateOfBirth: formatDateDDMMYYYY(date),
+                      }));
+                    }
+                    setDobOpen(false);
+                  }}
+                  captionLayout="dropdown"
+                  fromYear={1940}
+                  toYear={new Date().getFullYear()}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </Field>
+
+          {/* Date of Joining - Calendar Picker */}
           <Field label="Date of Joining">
-            <Input
-              value={form.dateOfJoining}
-              onChange={set("dateOfJoining")}
-              placeholder="DD/MM/YYYY"
-            />
+            <Popover open={dojOpen} onOpenChange={setDojOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  type="button"
+                  className="w-full justify-start text-left font-normal"
+                  data-ocid="create_payslip.doj.button"
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4 opacity-60" />
+                  {form.dateOfJoining ? (
+                    form.dateOfJoining
+                  ) : (
+                    <span className="text-muted-foreground">DD/MM/YYYY</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dojDate}
+                  onSelect={(date) => {
+                    if (date) {
+                      setForm((prev) => ({
+                        ...prev,
+                        dateOfJoining: formatDateDDMMYYYY(date),
+                      }));
+                    }
+                    setDojOpen(false);
+                  }}
+                  captionLayout="dropdown"
+                  fromYear={1990}
+                  toYear={new Date().getFullYear() + 1}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </Field>
         </CardContent>
       </Card>
@@ -404,6 +504,26 @@ export function PayslipForm({
               value={form.ifscCode}
               onChange={set("ifscCode")}
               placeholder="SBIN0001234"
+            />
+          </Field>
+        </CardContent>
+      </Card>
+
+      {/* Remarks */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-semibold text-primary uppercase tracking-wider">
+            Remarks
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Field label="Remark / Note for Employee">
+            <Textarea
+              value={form.remark}
+              onChange={set("remark")}
+              placeholder="Add any note or remark for this employee (visible to employee on screen only, not printed)"
+              rows={3}
+              data-ocid="create_payslip.remark.textarea"
             />
           </Field>
         </CardContent>

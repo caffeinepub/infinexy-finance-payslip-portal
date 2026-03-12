@@ -381,6 +381,51 @@ export function PayslipView({ payslip, showActions = true }: PayslipViewProps) {
           </span>
         </div>
       </div>
+
+      {/* Remark section — screen only, never printed */}
+      {payslip.remark && payslip.remark.trim() !== "" && (
+        <div
+          className="no-print"
+          style={{
+            maxWidth: "800px",
+            margin: "16px auto 0",
+          }}
+        >
+          <div
+            style={{
+              border: "1px solid #d0d4e0",
+              borderRadius: "8px",
+              overflow: "hidden",
+              backgroundColor: "#fffbeb",
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: "#1a2744",
+                color: "white",
+                padding: "8px 14px",
+                fontSize: "12px",
+                fontWeight: "600",
+                letterSpacing: "0.5px",
+              }}
+            >
+              REMARK
+            </div>
+            <div
+              style={{
+                padding: "12px 14px",
+                fontSize: "13px",
+                color: "#333",
+                lineHeight: "1.6",
+                whiteSpace: "pre-wrap",
+              }}
+              data-ocid="payslip.remark.panel"
+            >
+              {payslip.remark}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
