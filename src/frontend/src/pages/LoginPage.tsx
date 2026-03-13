@@ -13,9 +13,24 @@ interface LoginPageProps {
   onNavigateRegister: () => void;
 }
 
+function getStoredAdminCredentials(): { username: string; password: string } {
+  try {
+    const raw = localStorage.getItem("admin_credentials");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed.username && parsed.password) return parsed;
+    }
+  } catch {
+    // ignore
+  }
+  return { username: "admin", password: "" };
+}
+
 export function LoginPage({ onNavigateRegister }: LoginPageProps) {
   const { actor } = useActor();
   const { setUser } = useAuth();
+  const storedCreds = getStoredAdminCredentials();
+  const [adminUsername, setAdminUsername] = useState(storedCreds.username);
   const [adminPassword, setAdminPassword] = useState("");
   const [empUsername, setEmpUsername] = useState("");
   const [empPassword, setEmpPassword] = useState("");
@@ -29,10 +44,14 @@ export function LoginPage({ onNavigateRegister }: LoginPageProps) {
     }
     setLoading(true);
     try {
-      await actor.loginAdmin(adminPassword);
+      await (actor as any).loginAdmin(adminUsername, adminPassword);
+      localStorage.setItem(
+        "admin_credentials",
+        JSON.stringify({ username: adminUsername, password: adminPassword }),
+      );
       setUser({
         isAdmin: true,
-        username: "admin",
+        username: adminUsername,
         displayName: "Administrator",
       });
       toast.success("Welcome, Administrator!");
@@ -122,6 +141,18 @@ export function LoginPage({ onNavigateRegister }: LoginPageProps) {
             <TabsContent value="admin">
               <form onSubmit={handleAdminLogin} className="space-y-4">
                 <div className="space-y-1.5">
+                  <Label htmlFor="admin-username">Admin Username</Label>
+                  <Input
+                    id="admin-username"
+                    type="text"
+                    value={adminUsername}
+                    onChange={(e) => setAdminUsername(e.target.value)}
+                    placeholder="Enter admin username"
+                    required
+                    data-ocid="login.username.input"
+                  />
+                </div>
+                <div className="space-y-1.5">
                   <Label htmlFor="admin-password">Admin Password</Label>
                   <Input
                     id="admin-password"
@@ -184,7 +215,7 @@ export function LoginPage({ onNavigateRegister }: LoginPageProps) {
                   {loading ? "Signing in..." : "Sign In"}
                 </Button>
                 <p className="text-center text-sm text-muted-foreground">
-                  Don't have an account?{" "}
+                  Don&apos;t have an account?{" "}
                   <button
                     type="button"
                     onClick={onNavigateRegister}
@@ -201,7 +232,7 @@ export function LoginPage({ onNavigateRegister }: LoginPageProps) {
       </Card>
 
       <p className="mt-8 text-xs text-blue-300 text-center">
-        © {new Date().getFullYear()}. Built with love using{" "}
+        &copy; {new Date().getFullYear()}. Built with love using{" "}
         <a
           href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
           target="_blank"

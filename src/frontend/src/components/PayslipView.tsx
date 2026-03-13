@@ -25,7 +25,38 @@ export function PayslipView({ payslip, showActions = true }: PayslipViewProps) {
     minute: "2-digit",
   });
 
-  const handlePrint = () => window.print();
+  const handlePrint = () => {
+    const printContent = document.querySelector(
+      ".payslip-print-area",
+    ) as HTMLElement;
+    if (!printContent) return;
+
+    const popup = window.open("", "_blank", "width=900,height=700");
+    if (!popup) {
+      alert("Please allow popups for this site to print/download payslips.");
+      return;
+    }
+
+    popup.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <title>Payslip</title>
+  <style>
+    body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+    table { border-collapse: collapse; width: 100%; }
+    * { box-sizing: border-box; }
+  </style>
+</head>
+<body>
+  ${printContent.innerHTML}
+</body>
+</html>`);
+    popup.document.close();
+    popup.focus();
+    setTimeout(() => {
+      popup.print();
+    }, 300);
+  };
 
   return (
     <div>
@@ -123,7 +154,7 @@ export function PayslipView({ payslip, showActions = true }: PayslipViewProps) {
             <div
               style={{ fontSize: "14px", fontWeight: "700", marginTop: "2px" }}
             >
-              {payslip.month.toUpperCase()} – {String(payslip.year)}
+              {payslip.month.toUpperCase()} &ndash; {String(payslip.year)}
             </div>
           </div>
         </div>
@@ -156,16 +187,16 @@ export function PayslipView({ payslip, showActions = true }: PayslipViewProps) {
               value2={payslip.location}
             />
             <InfoRow
-              label="Business Unit"
-              value={payslip.businessUnit}
-              label2="Date of Birth"
-              value2={payslip.dateOfBirth}
+              label="Date of Birth"
+              value={payslip.dateOfBirth}
+              label2="Date of Joining"
+              value2={payslip.dateOfJoining}
             />
             <InfoRow
-              label="Date of Joining"
-              value={payslip.dateOfJoining}
-              label2="Days Paid"
-              value2={String(payslip.daysPaid)}
+              label="Days Paid"
+              value={String(payslip.daysPaid)}
+              label2="Payment Mode"
+              value2={payslip.paymentMode}
             />
           </tbody>
         </table>
@@ -347,16 +378,16 @@ export function PayslipView({ payslip, showActions = true }: PayslipViewProps) {
         >
           <tbody>
             <InfoRow
-              label="Payment Mode"
-              value={payslip.paymentMode}
-              label2="Bank Name"
-              value2={payslip.bankName}
+              label="Bank Name"
+              value={payslip.bankName}
+              label2="Account Number"
+              value2={payslip.accountNumber}
             />
             <InfoRow
-              label="Account Number"
-              value={payslip.accountNumber}
-              label2="IFSC Code"
-              value2={payslip.ifscCode}
+              label="IFSC Code"
+              value={payslip.ifscCode}
+              label2=""
+              value2=""
             />
           </tbody>
         </table>

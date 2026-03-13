@@ -10,7 +10,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   ArrowLeft,
@@ -18,9 +20,11 @@ import {
   FilePlus,
   FileText,
   LayoutDashboard,
+  Loader2,
   LogOut,
   Pencil,
   Search,
+  Settings,
   Trash2,
   Users,
 } from "lucide-react";
@@ -40,7 +44,26 @@ import {
 } from "../hooks/useQueries";
 import { formatCurrency } from "../utils/numberToWords";
 
-type AdminView = "payslips" | "create" | "employees" | "view" | "edit";
+type AdminView =
+  | "payslips"
+  | "create"
+  | "employees"
+  | "view"
+  | "edit"
+  | "settings";
+
+function getStoredAdminCredentials(): { username: string; password: string } {
+  try {
+    const raw = localStorage.getItem("admin_credentials");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed.username && parsed.password) return parsed;
+    }
+  } catch {
+    // ignore
+  }
+  return { username: "admin", password: "admin123" };
+}
 
 export function AdminPortal() {
   const { user, logout } = useAuth();
@@ -51,11 +74,18 @@ export function AdminPortal() {
   const [deleteTarget, setDeleteTarget] = useState<Payslip | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Re-establish admin session in backend every time actor is ready.
-  // The backend uses in-memory sessions that are lost on upgrade/reload.
+  // Settings state
+  const [settingsCurrentPassword, setSettingsCurrentPassword] = useState("");
+  const [settingsNewUsername, setSettingsNewUsername] = useState("");
+  const [settingsNewPassword, setSettingsNewPassword] = useState("");
+  const [settingsConfirmPassword, setSettingsConfirmPassword] = useState("");
+  const [settingsLoading, setSettingsLoading] = useState(false);
+
+  // Re-establish admin session using stored credentials
   useEffect(() => {
     if (!actor) return;
-    actor.loginAdmin("admin123").catch(() => {
+    const creds = getStoredAdminCredentials();
+    (actor as any).loginAdmin(creds.username, creds.password).catch(() => {
       // ignore silently
     });
   }, [actor]);
@@ -175,6 +205,48 @@ export function AdminPortal() {
     setDeleteTarget(null);
   };
 
+  const handleChangeCredentials = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!actor) {
+      toast.error("Connecting to server...");
+      return;
+    }
+    if (settingsNewPassword !== settingsConfirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+    if (!settingsNewUsername.trim() || !settingsNewPassword.trim()) {
+      toast.error("Username and password cannot be empty");
+      return;
+    }
+    setSettingsLoading(true);
+    try {
+      await (actor as any).changeAdminCredentials(
+        settingsCurrentPassword,
+        settingsNewUsername,
+        settingsNewPassword,
+      );
+      localStorage.setItem(
+        "admin_credentials",
+        JSON.stringify({
+          username: settingsNewUsername,
+          password: settingsNewPassword,
+        }),
+      );
+      toast.success("Admin credentials updated successfully!");
+      setSettingsCurrentPassword("");
+      setSettingsNewUsername("");
+      setSettingsNewPassword("");
+      setSettingsConfirmPassword("");
+    } catch (err: unknown) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to update credentials",
+      );
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
+
   const navItem = (
     view: AdminView,
     icon: React.ReactNode,
@@ -259,6 +331,12 @@ export function AdminPortal() {
             "Manage Employees",
             "nav.manage_employees.link",
           )}
+          {navItem(
+            "settings",
+            <Settings className="h-4 w-4" />,
+            "Settings",
+            "nav.settings.link",
+          )}
         </nav>
 
         {/* User & Logout */}
@@ -301,6 +379,7 @@ export function AdminPortal() {
               {activeView === "employees" && "Manage Employees"}
               {activeView === "view" && "Payslip Details"}
               {activeView === "edit" && "Edit Payslip"}
+              {activeView === "settings" && "Settings"}
             </h1>
           </div>
           {(activeView === "view" || activeView === "edit") && (
@@ -515,6 +594,102 @@ export function AdminPortal() {
                   </table>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Settings */}
+          {activeView === "settings" && (
+            <div className="max-w-lg">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base font-semibold text-primary flex items-center gap-2">
+                    <Settings className="h-4 w-4" />
+                    Change Admin Credentials
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form
+                    onSubmit={handleChangeCredentials}
+                    className="space-y-4"
+                  >
+                    <div className="space-y-1.5">
+                      <Label htmlFor="current-password">Current Password</Label>
+                      <Input
+                        id="current-password"
+                        type="password"
+                        value={settingsCurrentPassword}
+                        onChange={(e) =>
+                          setSettingsCurrentPassword(e.target.value)
+                        }
+                        placeholder="Enter current password"
+                        required
+                        data-ocid="settings.current_password.input"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="new-username">New Username</Label>
+                      <Input
+                        id="new-username"
+                        type="text"
+                        value={settingsNewUsername}
+                        onChange={(e) => setSettingsNewUsername(e.target.value)}
+                        placeholder="Enter new username"
+                        required
+                        data-ocid="settings.new_username.input"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="new-password">New Password</Label>
+                      <Input
+                        id="new-password"
+                        type="password"
+                        value={settingsNewPassword}
+                        onChange={(e) => setSettingsNewPassword(e.target.value)}
+                        placeholder="Enter new password"
+                        required
+                        data-ocid="settings.new_password.input"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="confirm-password">
+                        Confirm New Password
+                      </Label>
+                      <Input
+                        id="confirm-password"
+                        type="password"
+                        value={settingsConfirmPassword}
+                        onChange={(e) =>
+                          setSettingsConfirmPassword(e.target.value)
+                        }
+                        placeholder="Confirm new password"
+                        required
+                        data-ocid="settings.confirm_password.input"
+                      />
+                    </div>
+                    {settingsNewPassword &&
+                      settingsConfirmPassword &&
+                      settingsNewPassword !== settingsConfirmPassword && (
+                        <p
+                          className="text-sm text-destructive"
+                          data-ocid="settings.error_state"
+                        >
+                          Passwords do not match
+                        </p>
+                      )}
+                    <Button
+                      type="submit"
+                      disabled={settingsLoading}
+                      className="w-full"
+                      data-ocid="settings.submit.button"
+                    >
+                      {settingsLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : null}
+                      {settingsLoading ? "Updating..." : "Update Credentials"}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
             </div>
           )}
         </div>

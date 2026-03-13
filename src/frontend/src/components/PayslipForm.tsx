@@ -16,9 +16,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { CalendarIcon } from "lucide-react";
-import { useState } from "react";
+import { CalendarIcon, Loader2, RefreshCw } from "lucide-react";
+import { useEffect, useState } from "react";
 import type { Payslip } from "../backend";
+import { useActor } from "../hooks/useActor";
 
 const MONTHS = [
   "January",
@@ -35,7 +36,19 @@ const MONTHS = [
   "December",
 ];
 
-type PayslipFormData = {
+const LOCATIONS = ["Vadodara", "Delhi", "Ahmedabad", "Mumbai", "Surat"];
+
+const DESIGNATIONS = [
+  "Chartered Accountant",
+  "Telecaller",
+  "IT Developer",
+  "Managing Director",
+  "Branch Manager",
+  "Human Resources (HR)",
+  "Back Office",
+];
+
+export type PayslipFormData = {
   employeeUsername: string;
   month: string;
   year: string;
@@ -78,7 +91,7 @@ const DEFAULT_FORM: PayslipFormData = {
   dateOfBirth: "",
   dateOfJoining: "",
   daysPaid: "",
-  basicSalary: "",
+  basicSalary: "7500",
   mobileAllowance: "",
   incentive: "",
   insurance: "",
@@ -87,7 +100,7 @@ const DEFAULT_FORM: PayslipFormData = {
   bankName: "",
   accountNumber: "",
   ifscCode: "",
-  payableBasicSalary: "",
+  payableBasicSalary: "7500",
   payableMobileAllowance: "",
   payableIncentive: "",
   remark: "",
@@ -125,7 +138,7 @@ function payslipToForm(p: Payslip): PayslipFormData {
     dateOfBirth: p.dateOfBirth,
     dateOfJoining: p.dateOfJoining,
     daysPaid: String(p.daysPaid),
-    basicSalary: String(p.basicSalary),
+    basicSalary: "7500",
     mobileAllowance: String(p.mobileAllowance),
     incentive: String(p.incentive),
     insurance: String(p.insurance),
@@ -134,7 +147,7 @@ function payslipToForm(p: Payslip): PayslipFormData {
     bankName: p.bankName,
     accountNumber: p.accountNumber,
     ifscCode: p.ifscCode,
-    payableBasicSalary: String(p.payableBasicSalary),
+    payableBasicSalary: "7500",
     payableMobileAllowance: String(p.payableMobileAllowance),
     payableIncentive: String(p.payableIncentive),
     remark: p.remark ?? "",
@@ -148,28 +161,66 @@ interface PayslipFormProps {
   submitLabel?: string;
 }
 
-export type { PayslipFormData };
-
 export function PayslipForm({
   initial,
   onSubmit,
   isLoading,
   submitLabel = "Create Payslip",
 }: PayslipFormProps) {
+  const { actor } = useActor();
   const [form, setForm] = useState<PayslipFormData>(
     initial ? payslipToForm(initial) : DEFAULT_FORM,
   );
   const [dobOpen, setDobOpen] = useState(false);
   const [dojOpen, setDojOpen] = useState(false);
+  const [idLoading, setIdLoading] = useState(false);
+
+  const isEditing = !!initial;
 
   const set =
     (key: keyof PayslipFormData) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setForm((prev) => ({ ...prev, [key]: e.target.value }));
 
+  const generateEmployeeId = async (month: string, year: string) => {
+    if (!actor || !month || !year || isEditing) return;
+    setIdLoading(true);
+    try {
+      const id = await (actor as any).getNextEmployeeId(month, BigInt(year));
+      setForm((prev) => ({ ...prev, employeeId: id }));
+    } catch {
+      // ignore silently
+    } finally {
+      setIdLoading(false);
+    }
+  };
+
+  // Auto-generate employee ID when month or year changes (new payslip only)
+  useEffect(() => {
+    if (isEditing || !form.month || !form.year || !actor) return;
+    let cancelled = false;
+    setIdLoading(true);
+    (actor as any)
+      .getNextEmployeeId(form.month, BigInt(form.year))
+      .then((id: string) => {
+        if (!cancelled) setForm((prev) => ({ ...prev, employeeId: id }));
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setIdLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [form.month, form.year, actor, isEditing]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(form);
+    await onSubmit({
+      ...form,
+      basicSalary: "7500",
+      payableBasicSalary: "7500",
+    });
   };
 
   const dobDate = parseDDMMYYYY(form.dateOfBirth);
@@ -203,12 +254,33 @@ export function PayslipForm({
             />
           </Field>
           <Field label="Employee ID" required>
-            <Input
-              value={form.employeeId}
-              onChange={set("employeeId")}
-              placeholder="EMP001"
-              required
-            />
+            <div className="flex gap-2">
+              <Input
+                value={form.employeeId}
+                readOnly
+                placeholder={idLoading ? "Generating..." : "INF001"}
+                required
+                className="bg-muted/50 flex-1"
+                data-ocid="create_payslip.employee_id.input"
+              />
+              {!isEditing && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => generateEmployeeId(form.month, form.year)}
+                  disabled={idLoading || !form.month || !form.year}
+                  title="Generate Employee ID"
+                  data-ocid="create_payslip.generate_id.button"
+                >
+                  {idLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-4 w-4" />
+                  )}
+                </Button>
+              )}
+            </div>
           </Field>
           <Field label="PAN No.">
             <Input
@@ -225,26 +297,38 @@ export function PayslipForm({
             />
           </Field>
           <Field label="Designation" required>
-            <Input
+            <Select
               value={form.designation}
-              onChange={set("designation")}
-              placeholder="Software Engineer"
-              required
-            />
+              onValueChange={(v) => setForm((p) => ({ ...p, designation: v }))}
+            >
+              <SelectTrigger data-ocid="create_payslip.designation.select">
+                <SelectValue placeholder="Select designation" />
+              </SelectTrigger>
+              <SelectContent>
+                {DESIGNATIONS.map((d) => (
+                  <SelectItem key={d} value={d}>
+                    {d}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </Field>
           <Field label="Location">
-            <Input
+            <Select
               value={form.location}
-              onChange={set("location")}
-              placeholder="Vadodara"
-            />
-          </Field>
-          <Field label="Business Unit">
-            <Input
-              value={form.businessUnit}
-              onChange={set("businessUnit")}
-              placeholder="IT"
-            />
+              onValueChange={(v) => setForm((p) => ({ ...p, location: v }))}
+            >
+              <SelectTrigger data-ocid="create_payslip.location.select">
+                <SelectValue placeholder="Select location" />
+              </SelectTrigger>
+              <SelectContent>
+                {LOCATIONS.map((l) => (
+                  <SelectItem key={l} value={l}>
+                    {l}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </Field>
 
           {/* Date of Birth - Calendar Picker */}
@@ -384,20 +468,20 @@ export function PayslipForm({
         <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <Field label="Basic Salary (Actual)" required>
             <Input
-              value={form.basicSalary}
-              onChange={set("basicSalary")}
-              placeholder="25000"
-              required
+              value="7500"
+              readOnly
+              className="bg-muted/50"
               type="number"
+              data-ocid="create_payslip.basic_salary_actual.input"
             />
           </Field>
           <Field label="Basic Salary (Payable)" required>
             <Input
-              value={form.payableBasicSalary}
-              onChange={set("payableBasicSalary")}
-              placeholder="25000"
-              required
+              value="7500"
+              readOnly
+              className="bg-muted/50"
               type="number"
+              data-ocid="create_payslip.basic_salary_payable.input"
             />
           </Field>
           <Field label="Mobile Allowance (Actual)">
@@ -480,6 +564,7 @@ export function PayslipForm({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                <SelectItem value="NEFT">NEFT</SelectItem>
                 <SelectItem value="Cash">Cash</SelectItem>
                 <SelectItem value="Cheque">Cheque</SelectItem>
               </SelectContent>

@@ -8,11 +8,11 @@ import Array "mo:core/Array";
 import Order "mo:core/Order";
 import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
-import Migration "migration";
+
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
-(with migration = Migration.run)
+
 actor {
   type Employee = {
     username : Text;
@@ -76,6 +76,13 @@ actor {
 
   // Track admin sessions separately (bypasses AccessControl anonymous limitation)
   let adminSessions = Map.empty<Principal, Bool>();
+
+  // Admin credentials (mutable so they can be changed)
+  var adminUsername : Text = "admin";
+  var adminPassword : Text = "admin123";
+
+  // Month-wise employee ID counter: key = "MONTH-YEAR", value = last counter
+  let employeeIdCounter = Map.empty<Text, Nat>();
 
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
@@ -148,12 +155,46 @@ actor {
     };
   };
 
-  public shared ({ caller }) func loginAdmin(password : Text) : async () {
-    if (password != "admin123") {
+  public shared ({ caller }) func loginAdmin(username : Text, password : Text) : async () {
+    if (username != adminUsername or password != adminPassword) {
       Runtime.trap("Invalid admin credentials");
     };
     // Store admin session for this principal
     adminSessions.add(caller, true);
+  };
+
+  public shared ({ caller }) func changeAdminCredentials(currentPassword : Text, newUsername : Text, newPassword : Text) : async () {
+    if (currentPassword != adminPassword) {
+      Runtime.trap("Current password is incorrect");
+    };
+    if (newUsername == "") {
+      Runtime.trap("Username cannot be empty");
+    };
+    if (newPassword == "") {
+      Runtime.trap("Password cannot be empty");
+    };
+    adminUsername := newUsername;
+    adminPassword := newPassword;
+  };
+
+  // Generate the next employee ID for a given month/year
+  // Format: INF001, INF002, ... INF010, INF011, ...
+  public shared ({ caller }) func getNextEmployeeId(month : Text, year : Nat) : async Text {
+    if (not isAdminCaller(caller)) {
+      Runtime.trap("Unauthorized: Only admins can generate employee IDs");
+    };
+    let key = month # "-" # year.toText();
+    let current = switch (employeeIdCounter.get(key)) {
+      case (?n) { n };
+      case (null) { 0 };
+    };
+    let next = current + 1;
+    employeeIdCounter.add(key, next);
+    let numStr = next.toText();
+    let padded = if (next < 10) { "00" # numStr }
+                 else if (next < 100) { "0" # numStr }
+                 else { numStr };
+    "INF" # padded;
   };
 
   public query ({ caller }) func listAllEmployees() : async [Employee] {
