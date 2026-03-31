@@ -98,7 +98,7 @@ export function LoginPage({ onNavigateRegister }: LoginPageProps) {
           <img
             src="/assets/screenshot_2026-03-13_121927-019d42cf-27da-73a9-8a59-1cd2655ffbf8.png"
             alt="Infinexy Solutions"
-            className="h-10 w-32 object-contain rounded-lg bg-white p-1"
+            className="h-10 w-32 object-contain"
           />
           <div>
             <h1 className="text-2xl font-cabinet font-bold text-white tracking-wider">

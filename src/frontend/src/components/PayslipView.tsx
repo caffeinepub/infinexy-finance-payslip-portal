@@ -110,8 +110,6 @@ export function PayslipView({ payslip, showActions = true }: PayslipViewProps) {
                 width: "auto",
                 objectFit: "contain",
                 borderRadius: "4px",
-                backgroundColor: "white",
-                padding: "2px",
               }}
             />
             <div>
