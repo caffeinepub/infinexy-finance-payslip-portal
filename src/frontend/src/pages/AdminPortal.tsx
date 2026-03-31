@@ -297,7 +297,7 @@ export function AdminPortal() {
         {/* Logo */}
         <div className="flex items-center gap-3 px-5 py-5 border-b border-sidebar-border">
           <img
-            src="/assets/uploads/WhatsApp-Image-2026-02-27-at-11.18.04-AM-1.jpeg"
+            src="/assets/screenshot_2026-03-13_121927-019d42cf-27da-73a9-8a59-1cd2655ffbf8.png"
             alt="Logo"
             className="h-8 w-24 object-contain rounded bg-white p-0.5"
           />

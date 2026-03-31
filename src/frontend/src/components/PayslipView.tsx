@@ -103,8 +103,8 @@ export function PayslipView({ payslip, showActions = true }: PayslipViewProps) {
         >
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <img
-              src="/assets/uploads/WhatsApp-Image-2026-02-27-at-11.18.04-AM-1.jpeg"
-              alt="Infinexy Finance Logo"
+              src="/assets/screenshot_2026-03-13_121927-019d42cf-27da-73a9-8a59-1cd2655ffbf8.png"
+              alt="Infinexy Solutions Logo"
               style={{
                 height: "44px",
                 width: "auto",
@@ -122,7 +122,7 @@ export function PayslipView({ payslip, showActions = true }: PayslipViewProps) {
                   letterSpacing: "1px",
                 }}
               >
-                INFINEXY FINANCE
+                INFINEXY SOLUTIONS
               </div>
               <div
                 style={{

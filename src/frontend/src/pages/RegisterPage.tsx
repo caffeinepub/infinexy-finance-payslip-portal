@@ -47,13 +47,13 @@ export function RegisterPage({ onBack }: RegisterPageProps) {
       <div className="flex flex-col items-center mb-8">
         <div className="flex items-center gap-3">
           <img
-            src="/assets/uploads/WhatsApp-Image-2026-02-27-at-11.18.04-AM-1.jpeg"
-            alt="Infinexy Finance"
+            src="/assets/screenshot_2026-03-13_121927-019d42cf-27da-73a9-8a59-1cd2655ffbf8.png"
+            alt="Infinexy Solutions"
             className="h-9 w-28 object-contain rounded-lg bg-white p-1"
           />
           <div>
             <h1 className="text-xl font-cabinet font-bold text-white tracking-wider">
-              INFINEXY FINANCE
+              INFINEXY SOLUTIONS
             </h1>
             <p className="text-xs text-blue-200">Payroll Management Portal</p>
           </div>

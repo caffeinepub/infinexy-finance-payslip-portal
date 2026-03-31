@@ -96,13 +96,13 @@ export function LoginPage({ onNavigateRegister }: LoginPageProps) {
       <div className="flex flex-col items-center mb-8 animate-fade-in">
         <div className="flex items-center gap-3 mb-3">
           <img
-            src="/assets/uploads/WhatsApp-Image-2026-02-27-at-11.18.04-AM-1.jpeg"
-            alt="Infinexy Finance"
+            src="/assets/screenshot_2026-03-13_121927-019d42cf-27da-73a9-8a59-1cd2655ffbf8.png"
+            alt="Infinexy Solutions"
             className="h-10 w-32 object-contain rounded-lg bg-white p-1"
           />
           <div>
             <h1 className="text-2xl font-cabinet font-bold text-white tracking-wider">
-              INFINEXY FINANCE
+              INFINEXY SOLUTIONS
             </h1>
             <p className="text-xs text-blue-200 mt-0.5">
               Payroll Management Portal

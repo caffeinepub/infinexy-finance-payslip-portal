@@ -30,12 +30,12 @@ export function EmployeePortal() {
         <header className="no-print flex items-center justify-between px-6 py-4 border-b bg-card shadow-xs">
           <div className="flex items-center gap-3">
             <img
-              src="/assets/uploads/WhatsApp-Image-2026-02-27-at-11.18.04-AM-1.jpeg"
+              src="/assets/screenshot_2026-03-13_121927-019d42cf-27da-73a9-8a59-1cd2655ffbf8.png"
               alt="Logo"
               className="h-8 w-24 object-contain rounded bg-white p-0.5"
             />
             <span className="font-cabinet font-bold text-lg text-primary">
-              INFINEXY FINANCE
+              INFINEXY SOLUTIONS
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -71,13 +71,13 @@ export function EmployeePortal() {
       <header className="flex items-center justify-between px-6 py-4 border-b bg-card shadow-xs">
         <div className="flex items-center gap-3">
           <img
-            src="/assets/uploads/WhatsApp-Image-2026-02-27-at-11.18.04-AM-1.jpeg"
+            src="/assets/screenshot_2026-03-13_121927-019d42cf-27da-73a9-8a59-1cd2655ffbf8.png"
             alt="Logo"
             className="h-8 w-24 object-contain rounded bg-white p-0.5"
           />
           <div>
             <div className="font-cabinet font-bold text-lg text-primary">
-              INFINEXY FINANCE
+              INFINEXY SOLUTIONS
             </div>
             <div className="text-xs text-muted-foreground">Employee Portal</div>
           </div>
