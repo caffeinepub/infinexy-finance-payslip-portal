@@ -137,17 +137,19 @@ export enum UserRole {
 export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    changeAdminCredentials(currentPassword: string, newUsername: string, newPassword: string): Promise<void>;
     createPayslip(employeeUsername: string, month: string, year: bigint, employeeName: string, panNo: string, employeeId: string, aadharNumber: string, designation: string, location: string, businessUnit: string, dateOfBirth: string, dateOfJoining: string, daysPaid: bigint, basicSalary: bigint, mobileAllowance: bigint, incentive: bigint, insurance: bigint, professionTax: bigint, paymentMode: string, bankName: string, accountNumber: string, ifscCode: string, remark: string, payableBasicSalary: bigint, payableMobileAllowance: bigint, payableIncentive: bigint): Promise<void>;
     deletePayslip(payslipId: bigint): Promise<void>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getNextEmployeeId(month: string, year: bigint): Promise<string>;
     getPayslip(payslipId: bigint): Promise<Payslip>;
     getPayslipsByEmployee(username: string): Promise<Array<Payslip>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     listAllEmployees(): Promise<Array<Employee>>;
     listAllPayslips(): Promise<Array<Payslip>>;
-    loginAdmin(password: string): Promise<void>;
+    loginAdmin(username: string, password: string): Promise<void>;
     loginEmployee(username: string, password: string): Promise<void>;
     registerEmployee(username: string, employeeName: string, password: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
@@ -181,6 +183,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n1(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async changeAdminCredentials(arg0: string, arg1: string, arg2: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.changeAdminCredentials(arg0, arg1, arg2);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.changeAdminCredentials(arg0, arg1, arg2);
             return result;
         }
     }
@@ -238,6 +254,20 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.getCallerUserRole();
             return from_candid_UserRole_n4(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getNextEmployeeId(arg0: string, arg1: bigint): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getNextEmployeeId(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getNextEmployeeId(arg0, arg1);
+            return result;
         }
     }
     async getPayslip(arg0: bigint): Promise<Payslip> {
@@ -324,17 +354,17 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async loginAdmin(arg0: string): Promise<void> {
+    async loginAdmin(arg0: string, arg1: string): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.loginAdmin(arg0);
+                const result = await this.actor.loginAdmin(arg0, arg1);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.loginAdmin(arg0);
+            const result = await this.actor.loginAdmin(arg0, arg1);
             return result;
         }
     }

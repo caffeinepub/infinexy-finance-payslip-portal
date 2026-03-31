@@ -85,7 +85,7 @@ export function AdminPortal() {
   useEffect(() => {
     if (!actor) return;
     const creds = getStoredAdminCredentials();
-    (actor as any).loginAdmin(creds.username, creds.password).catch(() => {
+    actor.loginAdmin(creds.username, creds.password).catch(() => {
       // ignore silently
     });
   }, [actor]);
@@ -221,7 +221,7 @@ export function AdminPortal() {
     }
     setSettingsLoading(true);
     try {
-      await (actor as any).changeAdminCredentials(
+      await actor.changeAdminCredentials(
         settingsCurrentPassword,
         settingsNewUsername,
         settingsNewPassword,

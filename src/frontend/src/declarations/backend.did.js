@@ -57,6 +57,7 @@ export const Employee = IDL.Record({
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'changeAdminCredentials' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
   'createPayslip' : IDL.Func(
       [
         IDL.Text,
@@ -92,6 +93,7 @@ export const idlService = IDL.Service({
   'deletePayslip' : IDL.Func([IDL.Nat], [], []),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getNextEmployeeId' : IDL.Func([IDL.Text, IDL.Nat], [IDL.Text], []),
   'getPayslip' : IDL.Func([IDL.Nat], [Payslip], ['query']),
   'getPayslipsByEmployee' : IDL.Func([IDL.Text], [IDL.Vec(Payslip)], ['query']),
   'getUserProfile' : IDL.Func(
@@ -102,7 +104,7 @@ export const idlService = IDL.Service({
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'listAllEmployees' : IDL.Func([], [IDL.Vec(Employee)], ['query']),
   'listAllPayslips' : IDL.Func([], [IDL.Vec(Payslip)], ['query']),
-  'loginAdmin' : IDL.Func([IDL.Text], [], []),
+  'loginAdmin' : IDL.Func([IDL.Text, IDL.Text], [], []),
   'loginEmployee' : IDL.Func([IDL.Text, IDL.Text], [], []),
   'registerEmployee' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
@@ -190,6 +192,7 @@ export const idlFactory = ({ IDL }) => {
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'changeAdminCredentials' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
     'createPayslip' : IDL.Func(
         [
           IDL.Text,
@@ -225,6 +228,7 @@ export const idlFactory = ({ IDL }) => {
     'deletePayslip' : IDL.Func([IDL.Nat], [], []),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getNextEmployeeId' : IDL.Func([IDL.Text, IDL.Nat], [IDL.Text], []),
     'getPayslip' : IDL.Func([IDL.Nat], [Payslip], ['query']),
     'getPayslipsByEmployee' : IDL.Func(
         [IDL.Text],
@@ -239,7 +243,7 @@ export const idlFactory = ({ IDL }) => {
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'listAllEmployees' : IDL.Func([], [IDL.Vec(Employee)], ['query']),
     'listAllPayslips' : IDL.Func([], [IDL.Vec(Payslip)], ['query']),
-    'loginAdmin' : IDL.Func([IDL.Text], [], []),
+    'loginAdmin' : IDL.Func([IDL.Text, IDL.Text], [], []),
     'loginEmployee' : IDL.Func([IDL.Text, IDL.Text], [], []),
     'registerEmployee' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),

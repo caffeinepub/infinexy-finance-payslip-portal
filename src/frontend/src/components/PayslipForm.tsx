@@ -20,6 +20,7 @@ import { CalendarIcon, Loader2, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Payslip } from "../backend";
 import { useActor } from "../hooks/useActor";
+import { useAllEmployees } from "../hooks/useQueries";
 
 const MONTHS = [
   "January",
@@ -168,6 +169,7 @@ export function PayslipForm({
   submitLabel = "Create Payslip",
 }: PayslipFormProps) {
   const { actor } = useActor();
+  const { data: employees, isFetching: employeesFetching } = useAllEmployees();
   const [form, setForm] = useState<PayslipFormData>(
     initial ? payslipToForm(initial) : DEFAULT_FORM,
   );
@@ -181,6 +183,15 @@ export function PayslipForm({
     (key: keyof PayslipFormData) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setForm((prev) => ({ ...prev, [key]: e.target.value }));
+
+  const handleEmployeeSelect = (username: string) => {
+    const emp = employees?.find((e) => e.username === username);
+    setForm((prev) => ({
+      ...prev,
+      employeeUsername: username,
+      employeeName: emp ? emp.employeeName : prev.employeeName,
+    }));
+  };
 
   const generateEmployeeId = async (month: string, year: string) => {
     if (!actor || !month || !year || isEditing) return;
@@ -237,13 +248,36 @@ export function PayslipForm({
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <Field label="Employee Username" required>
-            <Input
+            <Select
               value={form.employeeUsername}
-              onChange={set("employeeUsername")}
-              placeholder="e.g. john.doe"
-              required
-              data-ocid="create_payslip.employee_username.input"
-            />
+              onValueChange={handleEmployeeSelect}
+              disabled={employeesFetching}
+            >
+              <SelectTrigger data-ocid="create_payslip.employee_username.select">
+                <SelectValue
+                  placeholder={
+                    employeesFetching
+                      ? "Loading employees..."
+                      : "Select employee"
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {employees && employees.length > 0 ? (
+                  employees.map((emp) => (
+                    <SelectItem key={emp.username} value={emp.username}>
+                      @{emp.username} – {emp.employeeName}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="__none__" disabled>
+                    {employeesFetching
+                      ? "Loading..."
+                      : "No employees registered"}
+                  </SelectItem>
+                )}
+              </SelectContent>
+            </Select>
           </Field>
           <Field label="Employee Name" required>
             <Input

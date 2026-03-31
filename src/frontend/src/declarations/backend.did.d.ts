@@ -53,6 +53,7 @@ export type UserRole = { 'admin' : null } |
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'changeAdminCredentials' : ActorMethod<[string, string, string], undefined>,
   'createPayslip' : ActorMethod<
     [
       string,
@@ -87,13 +88,14 @@ export interface _SERVICE {
   'deletePayslip' : ActorMethod<[bigint], undefined>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getNextEmployeeId' : ActorMethod<[string, bigint], string>,
   'getPayslip' : ActorMethod<[bigint], Payslip>,
   'getPayslipsByEmployee' : ActorMethod<[string], Array<Payslip>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'listAllEmployees' : ActorMethod<[], Array<Employee>>,
   'listAllPayslips' : ActorMethod<[], Array<Payslip>>,
-  'loginAdmin' : ActorMethod<[string], undefined>,
+  'loginAdmin' : ActorMethod<[string, string], undefined>,
   'loginEmployee' : ActorMethod<[string, string], undefined>,
   'registerEmployee' : ActorMethod<[string, string, string], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,

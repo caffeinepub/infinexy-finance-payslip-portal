@@ -77,7 +77,7 @@ actor {
   // Track admin sessions separately (bypasses AccessControl anonymous limitation)
   let adminSessions = Map.empty<Principal, Bool>();
 
-  // Admin credentials (mutable so they can be changed)
+  // Admin credentials (persist across upgrades/redeployments)
   var adminUsername : Text = "admin";
   var adminPassword : Text = "admin123";
 
@@ -163,7 +163,7 @@ actor {
     adminSessions.add(caller, true);
   };
 
-  public shared ({ caller }) func changeAdminCredentials(currentPassword : Text, newUsername : Text, newPassword : Text) : async () {
+  public shared func changeAdminCredentials(currentPassword : Text, newUsername : Text, newPassword : Text) : async () {
     if (currentPassword != adminPassword) {
       Runtime.trap("Current password is incorrect");
     };

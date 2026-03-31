@@ -54,17 +54,19 @@ export enum UserRole {
 }
 export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    changeAdminCredentials(currentPassword: string, newUsername: string, newPassword: string): Promise<void>;
     createPayslip(employeeUsername: string, month: string, year: bigint, employeeName: string, panNo: string, employeeId: string, aadharNumber: string, designation: string, location: string, businessUnit: string, dateOfBirth: string, dateOfJoining: string, daysPaid: bigint, basicSalary: bigint, mobileAllowance: bigint, incentive: bigint, insurance: bigint, professionTax: bigint, paymentMode: string, bankName: string, accountNumber: string, ifscCode: string, remark: string, payableBasicSalary: bigint, payableMobileAllowance: bigint, payableIncentive: bigint): Promise<void>;
     deletePayslip(payslipId: bigint): Promise<void>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getNextEmployeeId(month: string, year: bigint): Promise<string>;
     getPayslip(payslipId: bigint): Promise<Payslip>;
     getPayslipsByEmployee(username: string): Promise<Array<Payslip>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     listAllEmployees(): Promise<Array<Employee>>;
     listAllPayslips(): Promise<Array<Payslip>>;
-    loginAdmin(password: string): Promise<void>;
+    loginAdmin(username: string, password: string): Promise<void>;
     loginEmployee(username: string, password: string): Promise<void>;
     registerEmployee(username: string, employeeName: string, password: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
