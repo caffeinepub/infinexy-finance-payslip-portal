@@ -299,15 +299,13 @@ export function AdminPortal() {
           <img
             src="/assets/screenshot_2026-03-13_121927-019d42cf-27da-73a9-8a59-1cd2655ffbf8.png"
             alt="Logo"
-            className="h-8 w-24 object-contain"
+            className="h-16 w-48 object-contain"
           />
           <div>
             <div className="text-sm font-cabinet font-bold text-sidebar-foreground tracking-wide">
               INFINEXY
             </div>
-            <div className="text-xs text-sidebar-foreground/60">
-              Admin Portal
-            </div>
+            <div className="text-xs text-white">Admin Portal</div>
           </div>
         </div>
 

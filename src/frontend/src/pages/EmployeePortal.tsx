@@ -32,7 +32,7 @@ export function EmployeePortal() {
             <img
               src="/assets/screenshot_2026-03-13_121927-019d42cf-27da-73a9-8a59-1cd2655ffbf8.png"
               alt="Logo"
-              className="h-8 w-24 object-contain"
+              className="h-16 w-48 object-contain"
             />
             <span className="font-cabinet font-bold text-lg text-primary">
               INFINEXY SOLUTIONS
@@ -73,7 +73,7 @@ export function EmployeePortal() {
           <img
             src="/assets/screenshot_2026-03-13_121927-019d42cf-27da-73a9-8a59-1cd2655ffbf8.png"
             alt="Logo"
-            className="h-8 w-24 object-contain"
+            className="h-16 w-48 object-contain"
           />
           <div>
             <div className="font-cabinet font-bold text-lg text-primary">

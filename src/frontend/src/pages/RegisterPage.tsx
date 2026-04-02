@@ -49,7 +49,7 @@ export function RegisterPage({ onBack }: RegisterPageProps) {
           <img
             src="/assets/screenshot_2026-03-13_121927-019d42cf-27da-73a9-8a59-1cd2655ffbf8.png"
             alt="Infinexy Solutions"
-            className="h-9 w-28 object-contain rounded-lg bg-white p-1"
+            className="h-20 w-56 object-contain"
           />
           <div>
             <h1 className="text-xl font-cabinet font-bold text-white tracking-wider">

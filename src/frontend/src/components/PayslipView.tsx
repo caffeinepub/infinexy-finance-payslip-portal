@@ -106,7 +106,7 @@ export function PayslipView({ payslip, showActions = true }: PayslipViewProps) {
               src="/assets/screenshot_2026-03-13_121927-019d42cf-27da-73a9-8a59-1cd2655ffbf8.png"
               alt="Infinexy Solutions Logo"
               style={{
-                height: "44px",
+                height: "80px",
                 width: "auto",
                 objectFit: "contain",
                 borderRadius: "4px",
